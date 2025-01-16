@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMS Spam Detection</title>
+    <script>
+        async function checkSpam() {
+            const message = document.getElementById("message").value;
+
+            if (!message.trim()) {
+                alert("Please enter a message!");
+                return;
+            }
+
+            try {
+                const response = await fetch("http://127.0.0.1:5000/predict", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ message: message }),
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    alert("Error: " + error.error);
+                    return;
+                }
+
+                const data = await response.json();
+                document.getElementById("result").innerText = `Result: ${data.label}`;
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Failed to connect to the server.");
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>SMS Spam Detection</h1>
+    <textarea id="message" rows="4" cols="50" placeholder="Enter your message here"></textarea>
+    <br />
+    <button onclick="checkSpam()">Check Spam</button>
+    <p id="result"></p>
+</body>
+</html>
